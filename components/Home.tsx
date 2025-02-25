@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { useQuery, gql } from '@apollo/client'
-import { ActivityIndicator, FlatList, Text, View, StyleSheet } from 'react-native';
+import { ActivityIndicator, FlatList, Text, View, StyleSheet, TextInput } from 'react-native';
 
 const GET_ISSUES = gql`
     query GetIssues{
         repository(owner: "facebook", name: "react-native") {
-            issues(first: 50, states: OPEN, orderBy: {field: CREATED_AT, direction: DESC}) {
+            issues(first: 15, states: OPEN, orderBy: {field: CREATED_AT, direction: DESC}) {
                 edges {
                     node{
                         id
@@ -21,6 +21,7 @@ const GET_ISSUES = gql`
 
 const Home = () => {
     const { loading, error, data } = useQuery(GET_ISSUES)
+    const [search, setSearch] = useState('')
 
     if (loading)
         return <ActivityIndicator style={styles.loader} />
@@ -31,6 +32,13 @@ const Home = () => {
     return (
         <View style={styles.container}>
             <Text style={styles.header}>React Native Issues</Text>
+            <TextInput
+                value={search}
+                onChangeText={setSearch}
+                placeholder='Search...'
+                style={styles.error}
+            />
+
             <FlatList
                 data={data.repository.issues.edges}
                 keyExtractor={(item) => item.node.id}

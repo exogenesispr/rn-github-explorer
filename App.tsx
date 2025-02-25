@@ -1,17 +1,18 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
 import { ApolloProvider } from '@apollo/client';
-import client from './apolloClient';
+import client from './graphql/apolloClient';
 import Home from './components/Home';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import IssueListScreen from './app/index';
 
 export default function App() {
   return (
     <ApolloProvider client={client}>
-      <View style={styles.container}>
+      <SafeAreaProvider style={styles.container}>
         <StatusBar style="auto" />
-        <Home />
-      </View>
+        <IssueListScreen />
+      </SafeAreaProvider>
     </ApolloProvider>
   );
 }
