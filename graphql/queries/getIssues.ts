@@ -1,13 +1,14 @@
 import { gql } from "@apollo/client";
 
 export const GET_ISSUES = gql`
-    query GetIssues ($state: [IssueState!], $first: Int!, $after: String) {
+    query GetIssues ($state: [IssueState!], $first: Int!, $after: String, $query: String) {
         repository(owner: "facebook", name: "react-native") {
             issues(
                 states: $state,
                 first: $first,
                 after: $after,
                 orderBy: {field: CREATED_AT, direction: DESC},
+                filterBy: {search: $query}
                 ) {
                     pageInfo {
                         hasNextPage

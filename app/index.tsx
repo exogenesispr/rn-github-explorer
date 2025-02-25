@@ -4,28 +4,40 @@ import {
     View,
     Text,
     TextInput,
-    Pressable,
-    Switch,
     FlatList,
     ActivityIndicator,
     TouchableOpacity
 } from 'react-native'
 
 import { useQuery } from '@apollo/client'
+import { SEARCH_ISSUES } from '../graphql/queries/searchIssues'
 import { GET_ISSUES } from '../graphql/queries/getIssues'
 import IssueCard from '../components/IssueCard'
-import { Issue } from '../types/github'
+import { Issue, SearchQueryResult } from '../types/github'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 export default function IssueListScreen() {
     const [searchText, setSearchText] = useState('')
     const [issueState, setIssueState] = useState<'OPEN' | 'CLOSED'>('OPEN')
 
-    const { loading, error, data } = useQuery(GET_ISSUES, {
+    const buildQueryString = () => {
+        let query = 'repo:facebook/react-native is:issue ';
+
+        query += `is:${issueState.toLowerCase()} `;
+
+        if (searchText) {
+            query += `${searchText} in:title,body `;
+        }
+
+        return query.trim()
+    }
+
+
+
+    const { loading, error, data } = useQuery<SearchQueryResult>(SEARCH_ISSUES, {
         variables: {
-            state: [issueState],
-            query: searchText || null,
-            first: 5,
+            query: buildQueryString(),
+            first: 10,
             after: null
         },
     })
@@ -34,15 +46,13 @@ export default function IssueListScreen() {
         setIssueState(newState)
     }
 
+    const handleSearch = () => {
+        console.log('Searching for:', searchText)
+    }
+
     const handleIssuePress = (issue: Issue) => {
         console.log(`Moving to Issue ${issue.number} detail view`)
     }
-
-    if (loading)
-        return <ActivityIndicator style={styles.loader} />
-
-    if (error)
-        return <Text style={styles.error}>Error: {error.message}</Text>
 
     return (
         <SafeAreaView style={styles.container}>
@@ -94,15 +104,40 @@ export default function IssueListScreen() {
                     value={searchText}
                     onChangeText={setSearchText}
                 />
+
+                {(!!searchText) && (
+                    <TouchableOpacity
+                        style={styles.searchButton}
+                        onPress={handleSearch}
+                    >
+                        <Text style={styles.searchButtonText}>Search</Text>
+                    </TouchableOpacity>
+                )}
             </View>
 
-            <FlatList
-                data={data?.repository?.issues?.nodes || []}
-                keyExtractor={(item: Issue) => item.id}
-                renderItem={({ item }) => (
-                    <IssueCard item={item} onPress={handleIssuePress} />
-                )}
-            />
+
+            {loading ? (
+                <ActivityIndicator style={styles.loader} />
+            ) : error ? (
+                <Text style={styles.error}>Error: {error.message}</Text>
+            ) : (
+                <FlatList
+                    data={data?.search?.edges?.map(edge => edge.node) || []}
+                    keyExtractor={(item: Issue) => item.id}
+                    renderItem={({ item }) => (
+                        <IssueCard item={item} onPress={handleIssuePress} />
+                    )}
+                    ListEmptyComponent={
+                        <View style={styles.emptyContainer}>
+                            <Text style={styles.emptyText}>
+                                No issues found. Try again adjusting your search.
+                            </Text>
+                        </View>
+                    }
+
+                />
+
+            )}
 
         </SafeAreaView >
     )
@@ -141,6 +176,20 @@ const styles = StyleSheet.create({
         paddingHorizontal: 12,
         backgroundColor: '#fff',
     },
+    searchButton: {
+        marginLeft: 8,
+        backgroundColor: '#0366d6',
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingHorizontal: 16,
+        paddingVertical: 10,
+        borderRadius: 4,
+    },
+    searchButtonText: {
+        color: 'white',
+        fontWeight: 'bold',
+        fontSize: 14,
+    },
     loader: {
         flex: 1,
         justifyContent: "center",
@@ -178,5 +227,14 @@ const styles = StyleSheet.create({
     activeFilterText: {
         color: '#0366d6',
         fontWeight: 'bold',
+    },
+    emptyContainer: {
+        padding: 24,
+        alignItems: 'center',
+    },
+    emptyText: {
+        fontSize: 16,
+        color: '#586069',
+        textAlign: 'center',
     },
 });
