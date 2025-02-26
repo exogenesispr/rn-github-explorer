@@ -1,6 +1,7 @@
 export interface Author {
-    login: string;
-    avatarUrl: string;
+    login: string,
+    avatarUrl: string,
+    url?: string,
 }
 
 export interface Label {
@@ -9,13 +10,22 @@ export interface Label {
     color: string,
 }
 
-export interface Comments {
-    totalCount: number,
-}
-
 export interface PageInfo {
     hasNextPage: boolean,
-    endCursor: string,
+    endCursor: string | null,
+}
+
+export interface CommentsNode {
+    id: string,
+    author?: Author,
+    body: string,
+    createdAt: string,
+}
+
+export interface Comments {
+    totalCount: number,
+    pageInfo?: PageInfo,
+    nodes?: CommentsNode[],
 }
 
 export interface Repository {
@@ -26,7 +36,7 @@ export interface Issue {
     id: string,
     number: number,
     title: string,
-    body: string,
+    body?: string,
     bodyText?: string,
     state: 'OPEN' | 'CLOSED',
     createdAt: string,
@@ -51,4 +61,10 @@ export interface SearchConnection {
 
 export interface SearchQueryResult {
     search: SearchConnection,
+}
+
+export interface IssueDetailResult {
+    repository: {
+        issue: Issue,
+    }
 }
