@@ -32,8 +32,6 @@ export default function IssueListScreen() {
         return query.trim()
     }
 
-
-
     const { loading, error, data } = useQuery<SearchQueryResult>(SEARCH_ISSUES, {
         variables: {
             query: buildQueryString(),
