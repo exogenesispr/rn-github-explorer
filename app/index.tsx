@@ -11,12 +11,13 @@ import {
 
 import { useQuery } from '@apollo/client'
 import { SEARCH_ISSUES } from '../graphql/queries/searchIssues'
-import { GET_ISSUES } from '../graphql/queries/getIssues'
 import IssueCard from '../components/IssueCard'
 import { Issue, SearchQueryResult } from '../types/github'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { useRouter } from 'expo-router'
 
 export default function IssueListScreen() {
+    const router = useRouter()
     const [searchText, setSearchText] = useState('')
     const [issueState, setIssueState] = useState<'OPEN' | 'CLOSED'>('OPEN')
 
@@ -49,7 +50,7 @@ export default function IssueListScreen() {
     }
 
     const handleIssuePress = (issue: Issue) => {
-        console.log(`Moving to Issue ${issue.number} detail view`)
+        router.push(`/${issue.number}`)
     }
 
     return (
