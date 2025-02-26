@@ -2,10 +2,8 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
 import { ApolloProvider } from '@apollo/client';
 import client from './graphql/apolloClient';
-import Home from './components/Home';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import IssueListScreen from './app/index';
-import IssueDetailScreen from './app/[id]';
 
 export default function App() {
   return (
@@ -13,9 +11,8 @@ export default function App() {
       <SafeAreaProvider style={styles.container}>
         <StatusBar style="auto" />
 
-        <IssueDetailScreen testIssueNumber={49662} />
+        <IssueListScreen />
 
-        {/* <IssueListScreen /> */}
       </SafeAreaProvider>
     </ApolloProvider>
   );

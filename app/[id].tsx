@@ -17,19 +17,20 @@ import { GET_ISSUE_DETAIL } from '../graphql/queries/getIssueDetail'
 import { IssueDetailResult } from '../types/github'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
-interface IssueDetailTestProps {
-    testIssueNumber?: number,
-}
-
-export default function IssueDetailScreen({ testIssueNumber }: IssueDetailTestProps) {
+export default function IssueDetailScreen() {
     const params = useLocalSearchParams()
-    const issueNumber = testIssueNumber || params.id
+    const router = useRouter()
+    const issueNumber = Number(params.id)
     console.log(params.id)
 
     const { loading, error, data } = useQuery<IssueDetailResult>(GET_ISSUE_DETAIL, {
         variables: { number: issueNumber },
         skip: !issueNumber
     })
+
+    const handleGoBack = () => {
+        router.back()
+    }
 
     if (loading) {
         return (
@@ -47,7 +48,7 @@ export default function IssueDetailScreen({ testIssueNumber }: IssueDetailTestPr
                 <Text style={styles.errorDetail}>{error.message}</Text>
                 <TouchableOpacity
                     style={styles.backButton}
-                    onPress={() => console.log('pressed button to go back to issue list')}
+                    onPress={handleGoBack}
                 >
                     <Text style={styles.backButtonText}>Go Back</Text>
                 </TouchableOpacity>
@@ -76,7 +77,7 @@ export default function IssueDetailScreen({ testIssueNumber }: IssueDetailTestPr
             <View style={styles.header}>
                 <TouchableOpacity
                     style={styles.backButton}
-                    onPress={() => console.log('go back via back button')}
+                    onPress={handleGoBack}
                 >
                     <Text style={styles.backButtonText}>← Back</Text>
                 </TouchableOpacity>
