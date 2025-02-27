@@ -23,6 +23,7 @@ export default function IssueListScreen() {
     const [searchText, setSearchText] = useState('')
     const [debouncedSearchText, setDebouncedSearchText] = useState('')
     const [issueState, setIssueState] = useState<'OPEN' | 'CLOSED'>('OPEN')
+    const [isLoadingMore, setIsLoadingMore] = useState(false)
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -44,15 +45,49 @@ export default function IssueListScreen() {
         return query.trim()
     }
 
-    const { loading, error, data, refetch } = useQuery<SearchQueryResult>(SEARCH_ISSUES, {
+    const { loading, error, data, refetch, fetchMore } = useQuery<SearchQueryResult>(SEARCH_ISSUES, {
         variables: {
             query: buildQueryString(),
             first: 10,
             after: null
         },
+        notifyOnNetworkStatusChange: true,
     })
 
     const { refreshing, handleRefresh } = useRefresh(refetch)
+
+    const handleLoadMore = () => {
+        const pageInfo = data?.search?.pageInfo
+
+        if (pageInfo?.hasNextPage && !isLoadingMore) {
+            setIsLoadingMore(true)
+
+            fetchMore({
+                variables: {
+                    after: pageInfo?.endCursor,
+                    query: buildQueryString(),
+                    first: 10,
+                },
+
+                updateQuery: (prevResult, { fetchMoreResult }) => {
+                    if (!fetchMoreResult)
+                        return prevResult
+
+                    return {
+                        search: {
+                            ...fetchMoreResult.search,
+                            edges: [
+                                ...prevResult.search.edges,
+                                ...fetchMoreResult.search.edges
+                            ]
+                        }
+                    }
+                }
+            }).finally(() => {
+                setIsLoadingMore(false)
+            })
+        }
+    }
 
     const handleIssueStateChange = (newState: 'OPEN' | 'CLOSED') => {
         setIssueState(newState)
@@ -129,17 +164,25 @@ export default function IssueListScreen() {
             </View>
 
 
-            {loading && !refreshing ? (
+            {/* {loading && !refreshing ? ( */}
+
+            {/* {(!!data?.search?.edges) && loading ? ( */}
+
+            {!data?.search?.edges?.length && loading ? (
                 <ActivityIndicator style={styles.loader} />
             ) : error ? (
                 <Text style={styles.error}>Error: {error.message}</Text>
             ) : (
                 <FlatList
-                    data={data?.search?.edges?.map(edge => edge.node) || []}
+                    data={data?.search?.edges?.map((edge) => edge.node) || []}
                     keyExtractor={(item: Issue) => item.id}
                     renderItem={({ item }) => (
                         <IssueCard item={item} onPress={handleIssuePress} />
                     )}
+
+                    maintainVisibleContentPosition={{
+                        minIndexForVisible: 0
+                    }}
 
                     refreshControl={
                         <RefreshControl
@@ -150,12 +193,35 @@ export default function IssueListScreen() {
                         />
                     }
 
+                    onEndReached={handleLoadMore}
+                    onEndReachedThreshold={0.5}
+                    ListFooterComponent={
+                        loading || isLoadingMore ? (
+                            <View style={styles.loadingFooter}>
+                                <ActivityIndicator size='small' color='#0366d6' />
+                                <Text style={styles.loadingMoreText}>
+                                    {isLoadingMore ? 'Loading more issues...' : 'Loading...'}
+                                </Text>
+                            </View>
+                        ) : data?.search?.pageInfo?.hasNextPage ? (
+                            <TouchableOpacity
+                                // style={styles.loadMoreButton}
+                                onPress={handleLoadMore}
+                            >
+                                {/* <Text style={styles.loadMoreButtonText}>Load more issues</Text> */}
+                                <Text>Load more issues</Text>
+                            </TouchableOpacity>
+                        ) : null
+                    }
+
                     ListEmptyComponent={
-                        <View style={styles.emptyContainer}>
-                            <Text style={styles.emptyText}>
-                                No issues found. Try again adjusting your search.
-                            </Text>
-                        </View>
+                        !loading ? (
+                            <View style={styles.emptyContainer}>
+                                <Text style={styles.emptyText}>
+                                    No issues found. Try again adjusting your search.
+                                </Text>
+                            </View>
+                        ) : null
                     }
 
                 />
@@ -259,5 +325,15 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: '#586069',
         textAlign: 'center',
+    },
+    loadingFooter: {
+        padding: 16,
+        alignItems: 'center',
+        flexDirection: 'row',
+        justifyContent: 'center',
+    },
+    loadingMoreText: {
+        marginLeft: 8,
+        color: '#586069',
     },
 });
