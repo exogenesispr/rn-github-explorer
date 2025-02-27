@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
     StyleSheet,
     View,
@@ -19,15 +19,24 @@ import { useRouter } from 'expo-router'
 export default function IssueListScreen() {
     const router = useRouter()
     const [searchText, setSearchText] = useState('')
+    const [debouncedSearchText, setDebouncedSearchText] = useState('')
     const [issueState, setIssueState] = useState<'OPEN' | 'CLOSED'>('OPEN')
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearchText(searchText)
+        }, 1000)
+
+        return () => clearTimeout(timer)
+    }, [searchText])
 
     const buildQueryString = () => {
         let query = 'repo:facebook/react-native is:issue ';
 
         query += `is:${issueState.toLowerCase()} `;
 
-        if (searchText) {
-            query += `${searchText} in:title,body `;
+        if (debouncedSearchText) {
+            query += `${debouncedSearchText} in:title,body `;
         }
 
         return query.trim()
@@ -46,6 +55,7 @@ export default function IssueListScreen() {
     }
 
     const handleSearch = () => {
+        setDebouncedSearchText(searchText)
         console.log('Searching for:', searchText)
     }
 
