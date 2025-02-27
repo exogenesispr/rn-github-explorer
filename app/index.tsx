@@ -16,10 +16,10 @@ import IssueCard from '../components/IssueCard'
 import { Issue, SearchQueryResult } from '../types/github'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
+import { useRefresh } from '../hooks/useRefresh'
 
 export default function IssueListScreen() {
     const router = useRouter()
-    const [refreshing, setRefreshing] = useState(false)
     const [searchText, setSearchText] = useState('')
     const [debouncedSearchText, setDebouncedSearchText] = useState('')
     const [issueState, setIssueState] = useState<'OPEN' | 'CLOSED'>('OPEN')
@@ -52,6 +52,8 @@ export default function IssueListScreen() {
         },
     })
 
+    const { refreshing, handleRefresh } = useRefresh(refetch)
+
     const handleIssueStateChange = (newState: 'OPEN' | 'CLOSED') => {
         setIssueState(newState)
     }
@@ -63,19 +65,6 @@ export default function IssueListScreen() {
 
     const handleIssuePress = (issue: Issue) => {
         router.push(`/${issue.number}`)
-    }
-
-    const handleRefresh = () => {
-        setRefreshing(true)
-
-        refetch()
-            .then(() => {
-                setRefreshing(false)
-            })
-            .catch((error) => {
-                console.error('error refreshing: ', error)
-                setRefreshing(false)
-            })
     }
 
     return (
@@ -157,7 +146,7 @@ export default function IssueListScreen() {
                             refreshing={refreshing}
                             onRefresh={handleRefresh}
                             colors={['#0366d6']}
-                            tintColor={'#0366d6'}
+                            tintColor='#0366d6'
                         />
                     }
 

@@ -7,6 +7,7 @@ import {
     Text,
     ScrollView,
     Image,
+    RefreshControl,
 } from 'react-native'
 
 import { useQuery } from '@apollo/client'
@@ -16,6 +17,7 @@ import moment from 'moment'
 import { GET_ISSUE_DETAIL } from '../graphql/queries/getIssueDetail'
 import { IssueDetailResult } from '../types/github'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { useRefresh } from '../hooks/useRefresh'
 
 export default function IssueDetailScreen() {
     const params = useLocalSearchParams()
@@ -23,10 +25,12 @@ export default function IssueDetailScreen() {
     const issueNumber = Number(params.id)
     console.log(params.id)
 
-    const { loading, error, data } = useQuery<IssueDetailResult>(GET_ISSUE_DETAIL, {
+    const { loading, error, data, refetch } = useQuery<IssueDetailResult>(GET_ISSUE_DETAIL, {
         variables: { number: issueNumber },
         skip: !issueNumber
     })
+
+    const { refreshing, handleRefresh } = useRefresh(refetch)
 
     const handleGoBack = () => {
         router.back()
@@ -86,6 +90,14 @@ export default function IssueDetailScreen() {
 
             <ScrollView
                 style={styles.content}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={handleRefresh}
+                        colors={['#0366d6']}
+                        tintColor='#0366d6'
+                    />
+                }
             >
                 <View style={styles.issueHeader}>
                     <Text style={styles.issueTitle}>{issue.title}</Text>
