@@ -6,7 +6,8 @@ import {
     TextInput,
     FlatList,
     ActivityIndicator,
-    TouchableOpacity
+    TouchableOpacity,
+    RefreshControl,
 } from 'react-native'
 
 import { useQuery } from '@apollo/client'
@@ -15,6 +16,7 @@ import IssueCard from '../components/IssueCard'
 import { Issue, SearchQueryResult } from '../types/github'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
+import { useRefresh } from '../hooks/useRefresh'
 
 export default function IssueListScreen() {
     const router = useRouter()
@@ -42,13 +44,15 @@ export default function IssueListScreen() {
         return query.trim()
     }
 
-    const { loading, error, data } = useQuery<SearchQueryResult>(SEARCH_ISSUES, {
+    const { loading, error, data, refetch } = useQuery<SearchQueryResult>(SEARCH_ISSUES, {
         variables: {
             query: buildQueryString(),
             first: 10,
             after: null
         },
     })
+
+    const { refreshing, handleRefresh } = useRefresh(refetch)
 
     const handleIssueStateChange = (newState: 'OPEN' | 'CLOSED') => {
         setIssueState(newState)
@@ -125,7 +129,7 @@ export default function IssueListScreen() {
             </View>
 
 
-            {loading ? (
+            {loading && !refreshing ? (
                 <ActivityIndicator style={styles.loader} />
             ) : error ? (
                 <Text style={styles.error}>Error: {error.message}</Text>
@@ -136,6 +140,16 @@ export default function IssueListScreen() {
                     renderItem={({ item }) => (
                         <IssueCard item={item} onPress={handleIssuePress} />
                     )}
+
+                    refreshControl={
+                        <RefreshControl
+                            refreshing={refreshing}
+                            onRefresh={handleRefresh}
+                            colors={['#0366d6']}
+                            tintColor='#0366d6'
+                        />
+                    }
+
                     ListEmptyComponent={
                         <View style={styles.emptyContainer}>
                             <Text style={styles.emptyText}>
