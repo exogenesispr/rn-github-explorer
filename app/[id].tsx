@@ -68,7 +68,7 @@ export default function IssueDetailScreen() {
                 <Text style={styles.errorText}>Issue not found</Text>
                 <TouchableOpacity
                     style={styles.backButton}
-                    onPress={() => console.log('pressed button to go back to issue list')}
+                    onPress={handleGoBack}
                 >
                     <Text style={styles.backButtonText}>Go Back</Text>
                 </TouchableOpacity>
