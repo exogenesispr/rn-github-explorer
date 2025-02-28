@@ -12,6 +12,8 @@ import {
 
 import { useQuery } from '@apollo/client'
 
+import ErrorView from '../components/ErrorView'
+
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import moment from 'moment'
 import { GET_ISSUE_DETAIL } from '../graphql/queries/getIssueDetail'
@@ -51,18 +53,10 @@ export default function IssueDetailScreen() {
 
     if (error) {
         return (
-            <SafeAreaView style={styles.container}>
-                <View style={styles.errorContainer}>
-                    <Text style={styles.errorText}>Error loading issue</Text>
-                    <Text style={styles.errorDetail}>{error.message}</Text>
-                    <TouchableOpacity
-                        style={styles.backToListButton}
-                        onPress={handleGoBack}
-                    >
-                        <Text style={styles.backToListText}>Back to Issues List</Text>
-                    </TouchableOpacity>
-                </View>
-            </SafeAreaView>
+            <ErrorView
+                message={error.message}
+                onButtonPress={handleGoBack}
+            />
         )
     }
 
@@ -70,20 +64,11 @@ export default function IssueDetailScreen() {
 
     if (!issue) {
         return (
-            <SafeAreaView style={styles.container}>
-                <View style={styles.notFoundContainer}>
-                    <Text style={styles.notFoundTitle}>Issue not found</Text>
-                    <Text style={styles.notFoundDescription}>
-                        The issue you're looking for doesn't exist.
-                    </Text>
-                    <TouchableOpacity
-                        style={styles.backToListButton}
-                        onPress={handleGoBack}
-                    >
-                        <Text style={styles.backToListText}>Back to Issues List</Text>
-                    </TouchableOpacity>
-                </View>
-            </SafeAreaView>
+            <ErrorView
+                title='Issue not found'
+                message="The issue you're looking for doesn't exist."
+                onButtonPress={handleGoBack}
+            />
         )
     }
 

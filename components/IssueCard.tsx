@@ -6,12 +6,7 @@ import {
     Image,
 } from 'react-native'
 import moment from 'moment'
-import { Issue } from '../types/github'
-
-interface IssueCardProps {
-    item: Issue,
-    onPress?: (issue: Issue) => void,
-}
+import { IssueCardProps } from '../types/components'
 
 export default function IssueCard({ item, onPress }: IssueCardProps) {
     return (
