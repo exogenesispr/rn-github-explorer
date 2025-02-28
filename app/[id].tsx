@@ -22,6 +22,7 @@ import { IssueDetailResult } from '../types/github'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRefresh } from '../hooks/useRefresh'
 import IssueHeader from '../components/IssueHeader'
+import IssueMetadata from '../components/IssueMetadata'
 
 export default function IssueDetailScreen() {
     const params = useLocalSearchParams()
@@ -102,20 +103,10 @@ export default function IssueDetailScreen() {
                 </View>
 
                 <View style={styles.issueMetadata}>
-                    <View style={styles.authorInfo}>
-                        {issue.author && (
-                            <>
-                                <Image
-                                    source={{ uri: issue.author.avatarUrl }}
-                                    style={styles.avatar}
-                                />
-                                <Text style={styles.authorName}>{issue.author.login}</Text>
-                            </>
-                        )}
-                        <Text style={styles.dateText}>
-                            opened on {moment(issue.createdAt).format('MMM D, YYYY')}
-                        </Text>
-                    </View>
+                    <IssueMetadata
+                        author={issue.author}
+                        createdAt={issue.createdAt}
+                    />
                 </View>
 
                 {(!!issue.labels.nodes) && (
@@ -144,24 +135,15 @@ export default function IssueDetailScreen() {
                     </Text>
                 </View>
 
-                {(!!issue.comments.nodes) ? (
+                {(issue?.comments?.nodes && issue?.comments?.nodes.length > 0) ? (
                     issue.comments.nodes.map((comment) => (
                         <View key={comment.id} style={styles.commentContainer}>
                             <View style={styles.commentHeader}>
-                                <View style={styles.authorInfo}>
-                                    {comment.author && (
-                                        <>
-                                            <Image
-                                                source={{ uri: comment.author.avatarUrl }}
-                                                style={styles.avatar}
-                                            />
-                                            <Text style={styles.authorName}>{comment.author.login}</Text>
-                                        </>
-                                    )}
-                                    <Text style={styles.dateText}>
-                                        commented on {moment(comment.createdAt).format('MMM D, YYYY')}
-                                    </Text>
-                                </View>
+                                <IssueMetadata
+                                    author={comment.author}
+                                    createdAt={comment.createdAt}
+                                    datePrefix="commented on"
+                                />
                             </View>
                             <Text style={styles.commentBody}>{comment.body}</Text>
                         </View>

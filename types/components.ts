@@ -22,3 +22,12 @@ export interface IssueHeaderProps {
     title: string,
     onBackPress: () => void
 }
+
+export interface IssueMetadataProps {
+    author?: {
+        login: string,
+        avatarUrl: string,
+    },
+    createdAt: string,
+    datePrefix?: string,
+}
