@@ -12,3 +12,8 @@ export interface IssueCardProps {
     onPress?: (issue: Issue) => void,
 }
 
+export interface LoadingViewProps {
+    message?: string,
+    color?: string,
+    size?: 'small' | 'large'
+}

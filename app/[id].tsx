@@ -13,6 +13,7 @@ import {
 import { useQuery } from '@apollo/client'
 
 import ErrorView from '../components/ErrorView'
+import LoadingView from '../components/LoadingView'
 
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import moment from 'moment'
@@ -44,10 +45,9 @@ export default function IssueDetailScreen() {
 
     if (loading) {
         return (
-            <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#0366d6" />
-                <Text style={styles.loadingText}>Loading issue details...</Text>
-            </View>
+            <LoadingView
+                message='Loading issue details...'
+            />
         )
     }
 
