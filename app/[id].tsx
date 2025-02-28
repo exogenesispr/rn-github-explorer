@@ -24,6 +24,9 @@ import { useRefresh } from '../hooks/useRefresh'
 import IssueHeader from '../components/IssueHeader'
 import IssueMetadata from '../components/IssueMetadata'
 import CommentList from '../components/CommentList'
+import IssueBody from '../components/IssueBody'
+import LabelsList from '../components/LabelsList'
+import IssueListScreen from '.'
 
 export default function IssueDetailScreen() {
     const params = useLocalSearchParams()
@@ -110,25 +113,9 @@ export default function IssueDetailScreen() {
                     />
                 </View>
 
-                {(!!issue.labels.nodes) && (
-                    <View style={styles.labelsContainer}>
-                        {issue.labels.nodes.map((label) => (
-                            <View
-                                key={label.id}
-                                style={[
-                                    styles.labelBadge,
-                                    { backgroundColor: `#${label.color}` }
-                                ]}
-                            >
-                                <Text style={styles.labelText}>{label.name}</Text>
-                            </View>
-                        ))}
-                    </View>
-                )}
+                <LabelsList labels={issue.labels} />
 
-                <View style={styles.issueBody}>
-                    <Text style={styles.bodyText}>{issue.bodyText}</Text>
-                </View>
+                <IssueBody bodyText={issue.bodyText} />
 
                 <CommentList comments={issue.comments} />
             </ScrollView>

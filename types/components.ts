@@ -1,4 +1,4 @@
-import { Issue } from '../types/github'
+import { Issue, Label } from '../types/github'
 
 export interface ErrorViewProps {
     title?: string,
@@ -56,5 +56,16 @@ export interface CommentListProps {
             createdAt: string,
         }>,
         totalCount: number,
+    }
+}
+
+export interface IssueBodyProps {
+    bodyText: string,
+    maxLines?: number,
+}
+
+export interface LabelsListProps {
+    labels: {
+        nodes: Label[]
     }
 }
