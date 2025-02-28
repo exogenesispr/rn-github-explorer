@@ -21,6 +21,7 @@ import { GET_ISSUE_DETAIL } from '../graphql/queries/getIssueDetail'
 import { IssueDetailResult } from '../types/github'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRefresh } from '../hooks/useRefresh'
+import IssueHeader from '../components/IssueHeader'
 
 export default function IssueDetailScreen() {
     const params = useLocalSearchParams()
@@ -74,15 +75,10 @@ export default function IssueDetailScreen() {
 
     return (
         <SafeAreaView style={styles.container}>
-            <View style={styles.header}>
-                <TouchableOpacity
-                    style={styles.backButton}
-                    onPress={handleGoBack}
-                >
-                    <Text style={styles.backButtonText}>← Back</Text>
-                </TouchableOpacity>
-                <Text style={styles.headerTitle}>Issue #{issue.number}</Text>
-            </View>
+            <IssueHeader
+                title={`Issue #${issue.number}`}
+                onBackPress={handleGoBack}
+            />
 
             <ScrollView
                 style={styles.content}

@@ -17,3 +17,8 @@ export interface LoadingViewProps {
     color?: string,
     size?: 'small' | 'large'
 }
+
+export interface IssueHeaderProps {
+    title: string,
+    onBackPress: () => void
+}
