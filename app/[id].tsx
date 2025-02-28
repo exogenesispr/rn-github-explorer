@@ -12,12 +12,21 @@ import {
 
 import { useQuery } from '@apollo/client'
 
+import ErrorView from '../components/ErrorView'
+import LoadingView from '../components/LoadingView'
+
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import moment from 'moment'
 import { GET_ISSUE_DETAIL } from '../graphql/queries/getIssueDetail'
 import { IssueDetailResult } from '../types/github'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRefresh } from '../hooks/useRefresh'
+import IssueHeader from '../components/IssueHeader'
+import IssueMetadata from '../components/IssueMetadata'
+import CommentList from '../components/CommentList'
+import IssueBody from '../components/IssueBody'
+import LabelsList from '../components/LabelsList'
+import IssueListScreen from '.'
 
 export default function IssueDetailScreen() {
     const params = useLocalSearchParams()
@@ -42,27 +51,18 @@ export default function IssueDetailScreen() {
 
     if (loading) {
         return (
-            <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#0366d6" />
-                <Text style={styles.loadingText}>Loading issue details...</Text>
-            </View>
+            <LoadingView
+                message='Loading issue details...'
+            />
         )
     }
 
     if (error) {
         return (
-            <SafeAreaView style={styles.container}>
-                <View style={styles.errorContainer}>
-                    <Text style={styles.errorText}>Error loading issue</Text>
-                    <Text style={styles.errorDetail}>{error.message}</Text>
-                    <TouchableOpacity
-                        style={styles.backToListButton}
-                        onPress={handleGoBack}
-                    >
-                        <Text style={styles.backToListText}>Back to Issues List</Text>
-                    </TouchableOpacity>
-                </View>
-            </SafeAreaView>
+            <ErrorView
+                message={error.message}
+                onButtonPress={handleGoBack}
+            />
         )
     }
 
@@ -70,34 +70,20 @@ export default function IssueDetailScreen() {
 
     if (!issue) {
         return (
-            <SafeAreaView style={styles.container}>
-                <View style={styles.notFoundContainer}>
-                    <Text style={styles.notFoundTitle}>Issue not found</Text>
-                    <Text style={styles.notFoundDescription}>
-                        The issue you're looking for doesn't exist.
-                    </Text>
-                    <TouchableOpacity
-                        style={styles.backToListButton}
-                        onPress={handleGoBack}
-                    >
-                        <Text style={styles.backToListText}>Back to Issues List</Text>
-                    </TouchableOpacity>
-                </View>
-            </SafeAreaView>
+            <ErrorView
+                title='Issue not found'
+                message="The issue you're looking for doesn't exist."
+                onButtonPress={handleGoBack}
+            />
         )
     }
 
     return (
         <SafeAreaView style={styles.container}>
-            <View style={styles.header}>
-                <TouchableOpacity
-                    style={styles.backButton}
-                    onPress={handleGoBack}
-                >
-                    <Text style={styles.backButtonText}>← Back</Text>
-                </TouchableOpacity>
-                <Text style={styles.headerTitle}>Issue #{issue.number}</Text>
-            </View>
+            <IssueHeader
+                title={`Issue #${issue.number}`}
+                onBackPress={handleGoBack}
+            />
 
             <ScrollView
                 style={styles.content}
@@ -121,73 +107,17 @@ export default function IssueDetailScreen() {
                 </View>
 
                 <View style={styles.issueMetadata}>
-                    <View style={styles.authorInfo}>
-                        {issue.author && (
-                            <>
-                                <Image
-                                    source={{ uri: issue.author.avatarUrl }}
-                                    style={styles.avatar}
-                                />
-                                <Text style={styles.authorName}>{issue.author.login}</Text>
-                            </>
-                        )}
-                        <Text style={styles.dateText}>
-                            opened on {moment(issue.createdAt).format('MMM D, YYYY')}
-                        </Text>
-                    </View>
+                    <IssueMetadata
+                        author={issue.author}
+                        createdAt={issue.createdAt}
+                    />
                 </View>
 
-                {(!!issue.labels.nodes) && (
-                    <View style={styles.labelsContainer}>
-                        {issue.labels.nodes.map((label) => (
-                            <View
-                                key={label.id}
-                                style={[
-                                    styles.labelBadge,
-                                    { backgroundColor: `#${label.color}` }
-                                ]}
-                            >
-                                <Text style={styles.labelText}>{label.name}</Text>
-                            </View>
-                        ))}
-                    </View>
-                )}
+                <LabelsList labels={issue.labels} />
 
-                <View style={styles.issueBody}>
-                    <Text style={styles.bodyText}>{issue.bodyText}</Text>
-                </View>
+                <IssueBody bodyText={issue.bodyText} />
 
-                <View style={styles.commentsHeader}>
-                    <Text style={styles.commentsTitle}>
-                        Comments ({issue.comments.totalCount})
-                    </Text>
-                </View>
-
-                {(!!issue.comments.nodes) ? (
-                    issue.comments.nodes.map((comment) => (
-                        <View key={comment.id} style={styles.commentContainer}>
-                            <View style={styles.commentHeader}>
-                                <View style={styles.authorInfo}>
-                                    {comment.author && (
-                                        <>
-                                            <Image
-                                                source={{ uri: comment.author.avatarUrl }}
-                                                style={styles.avatar}
-                                            />
-                                            <Text style={styles.authorName}>{comment.author.login}</Text>
-                                        </>
-                                    )}
-                                    <Text style={styles.dateText}>
-                                        commented on {moment(comment.createdAt).format('MMM D, YYYY')}
-                                    </Text>
-                                </View>
-                            </View>
-                            <Text style={styles.commentBody}>{comment.body}</Text>
-                        </View>
-                    ))
-                ) : (
-                    <Text style={styles.noCommentsText}>No comments yet</Text>
-                )}
+                <CommentList comments={issue.comments} />
             </ScrollView>
         </SafeAreaView>
     )
