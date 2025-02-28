@@ -163,12 +163,7 @@ export default function IssueListScreen() {
                 )}
             </View>
 
-
-            {/* {loading && !refreshing ? ( */}
-
-            {/* {(!!data?.search?.edges) && loading ? ( */}
-
-            {!data?.search?.edges?.length && loading ? (
+            {(!data?.search?.edges) && loading ? (
                 <ActivityIndicator style={styles.loader} />
             ) : error ? (
                 <Text style={styles.error}>Error: {error.message}</Text>
@@ -203,14 +198,6 @@ export default function IssueListScreen() {
                                     {isLoadingMore ? 'Loading more issues...' : 'Loading...'}
                                 </Text>
                             </View>
-                        ) : data?.search?.pageInfo?.hasNextPage ? (
-                            <TouchableOpacity
-                                // style={styles.loadMoreButton}
-                                onPress={handleLoadMore}
-                            >
-                                {/* <Text style={styles.loadMoreButtonText}>Load more issues</Text> */}
-                                <Text>Load more issues</Text>
-                            </TouchableOpacity>
                         ) : null
                     }
 
@@ -335,5 +322,5 @@ const styles = StyleSheet.create({
     loadingMoreText: {
         marginLeft: 8,
         color: '#586069',
-    },
+    }
 });
