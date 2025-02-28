@@ -31,3 +31,30 @@ export interface IssueMetadataProps {
     createdAt: string,
     datePrefix?: string,
 }
+
+export interface CommentItemProps {
+    comment: {
+        id: string,
+        author?: {
+            login: string,
+            avatarUrl: string,
+        }
+        body: string,
+        createdAt: string
+    }
+}
+
+export interface CommentListProps {
+    comments: {
+        nodes?: Array<{
+            id: string,
+            author?: {
+                login: string,
+                avatarUrl: string,
+            },
+            body: string,
+            createdAt: string,
+        }>,
+        totalCount: number,
+    }
+}

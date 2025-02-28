@@ -23,6 +23,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRefresh } from '../hooks/useRefresh'
 import IssueHeader from '../components/IssueHeader'
 import IssueMetadata from '../components/IssueMetadata'
+import CommentList from '../components/CommentList'
 
 export default function IssueDetailScreen() {
     const params = useLocalSearchParams()
@@ -129,28 +130,7 @@ export default function IssueDetailScreen() {
                     <Text style={styles.bodyText}>{issue.bodyText}</Text>
                 </View>
 
-                <View style={styles.commentsHeader}>
-                    <Text style={styles.commentsTitle}>
-                        Comments ({issue.comments.totalCount})
-                    </Text>
-                </View>
-
-                {(issue?.comments?.nodes && issue?.comments?.nodes.length > 0) ? (
-                    issue.comments.nodes.map((comment) => (
-                        <View key={comment.id} style={styles.commentContainer}>
-                            <View style={styles.commentHeader}>
-                                <IssueMetadata
-                                    author={comment.author}
-                                    createdAt={comment.createdAt}
-                                    datePrefix="commented on"
-                                />
-                            </View>
-                            <Text style={styles.commentBody}>{comment.body}</Text>
-                        </View>
-                    ))
-                ) : (
-                    <Text style={styles.noCommentsText}>No comments yet</Text>
-                )}
+                <CommentList comments={issue.comments} />
             </ScrollView>
         </SafeAreaView>
     )
