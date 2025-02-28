@@ -60,7 +60,7 @@ export interface CommentListProps {
 }
 
 export interface IssueBodyProps {
-    bodyText: string,
+    bodyText?: string,
     maxLines?: number,
 }
 
