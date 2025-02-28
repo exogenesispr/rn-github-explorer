@@ -33,7 +33,11 @@ export default function IssueDetailScreen() {
     const { refreshing, handleRefresh } = useRefresh(refetch)
 
     const handleGoBack = () => {
-        router.back()
+        router.canGoBack() ? (
+            router.back()
+        ) : (
+            router.push('/')
+        )
     }
 
     if (loading) {
@@ -47,16 +51,18 @@ export default function IssueDetailScreen() {
 
     if (error) {
         return (
-            <View style={styles.errorContainer}>
-                <Text style={styles.errorText}>Error loading issue</Text>
-                <Text style={styles.errorDetail}>{error.message}</Text>
-                <TouchableOpacity
-                    style={styles.backButton}
-                    onPress={handleGoBack}
-                >
-                    <Text style={styles.backButtonText}>Go Back</Text>
-                </TouchableOpacity>
-            </View>
+            <SafeAreaView style={styles.container}>
+                <View style={styles.errorContainer}>
+                    <Text style={styles.errorText}>Error loading issue</Text>
+                    <Text style={styles.errorDetail}>{error.message}</Text>
+                    <TouchableOpacity
+                        style={styles.backToListButton}
+                        onPress={handleGoBack}
+                    >
+                        <Text style={styles.backToListText}>Back to Issues List</Text>
+                    </TouchableOpacity>
+                </View>
+            </SafeAreaView>
         )
     }
 
@@ -64,15 +70,20 @@ export default function IssueDetailScreen() {
 
     if (!issue) {
         return (
-            <View style={styles.errorContainer}>
-                <Text style={styles.errorText}>Issue not found</Text>
-                <TouchableOpacity
-                    style={styles.backButton}
-                    onPress={handleGoBack}
-                >
-                    <Text style={styles.backButtonText}>Go Back</Text>
-                </TouchableOpacity>
-            </View>
+            <SafeAreaView style={styles.container}>
+                <View style={styles.notFoundContainer}>
+                    <Text style={styles.notFoundTitle}>Issue not found</Text>
+                    <Text style={styles.notFoundDescription}>
+                        The issue you're looking for doesn't exist.
+                    </Text>
+                    <TouchableOpacity
+                        style={styles.backToListButton}
+                        onPress={handleGoBack}
+                    >
+                        <Text style={styles.backToListText}>Back to Issues List</Text>
+                    </TouchableOpacity>
+                </View>
+            </SafeAreaView>
         )
     }
 
@@ -325,18 +336,54 @@ const styles = StyleSheet.create({
     },
     errorContainer: {
         flex: 1,
-        justifyContent: 'center',
         alignItems: 'center',
+        justifyContent: 'center',
         padding: 20,
+        backgroundColor: '#f6f8fa',
     },
     errorText: {
-        fontSize: 18,
+        fontSize: 22,
         fontWeight: 'bold',
-        marginBottom: 8,
+        color: '#24292e',
+        marginBottom: 12,
     },
     errorDetail: {
-        color: '#cb2431',
-        marginBottom: 16,
+        fontSize: 16,
+        color: '#586069',
         textAlign: 'center',
+        marginBottom: 24,
+        lineHeight: 22,
+        maxWidth: '90%',
+    },
+    notFoundContainer: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 20,
+        backgroundColor: '#f6f8fa',
+    },
+    notFoundTitle: {
+        fontSize: 22,
+        fontWeight: 'bold',
+        color: '#24292e',
+        marginBottom: 12,
+    },
+    notFoundDescription: {
+        fontSize: 16,
+        color: '#586069',
+        textAlign: 'center',
+        marginBottom: 24,
+        lineHeight: 22,
+    },
+    backToListButton: {
+        backgroundColor: '#0366d6',
+        paddingHorizontal: 20,
+        paddingVertical: 12,
+        borderRadius: 6,
+    },
+    backToListText: {
+        color: 'white',
+        fontWeight: 'bold',
+        fontSize: 16,
     },
 })
