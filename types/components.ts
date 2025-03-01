@@ -69,3 +69,8 @@ export interface LabelsListProps {
         nodes: Label[]
     }
 }
+
+export interface IssueTitleStateProps {
+    title: string,
+    state: 'OPEN' | 'CLOSED',
+}
