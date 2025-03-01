@@ -17,21 +17,14 @@ import { Issue, SearchQueryResult } from '../types/github'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
 import { useRefresh } from '../hooks/useRefresh'
+import HomeHeader from '../components/HomeHeader'
+import SearchBar from '../components/SearchBar'
 
 export default function IssueListScreen() {
     const router = useRouter()
-    const [searchText, setSearchText] = useState('')
     const [debouncedSearchText, setDebouncedSearchText] = useState('')
     const [issueState, setIssueState] = useState<'OPEN' | 'CLOSED'>('OPEN')
     const [isLoadingMore, setIsLoadingMore] = useState(false)
-
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setDebouncedSearchText(searchText)
-        }, 1000)
-
-        return () => clearTimeout(timer)
-    }, [searchText])
 
     const buildQueryString = () => {
         let query = 'repo:facebook/react-native is:issue ';
@@ -93,75 +86,15 @@ export default function IssueListScreen() {
         setIssueState(newState)
     }
 
-    const handleSearch = () => {
-        setDebouncedSearchText(searchText)
-        console.log('Searching for:', searchText)
-    }
-
     const handleIssuePress = (issue: Issue) => {
         router.push(`/${issue.number}`)
     }
 
     return (
         <SafeAreaView style={styles.container}>
-            <View style={styles.header}>
-                <Text style={styles.headerTitle}>React Native Issues</Text>
+            <HomeHeader currentState={issueState} onStateChange={setIssueState} />
 
-                <View style={styles.filterContainer}>
-                    <TouchableOpacity
-                        style={[
-                            styles.filterButton,
-                            issueState === 'OPEN' && styles.activeFilterButton
-                        ]}
-                        onPress={() => handleIssueStateChange('OPEN')}
-                    >
-                        <Text
-                            style={[
-                                styles.filterButtonText,
-                                issueState === 'OPEN' && styles.activeFilterText
-                            ]}
-                        >
-                            Open
-                        </Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                        style={[
-                            styles.filterButton,
-                            issueState === 'CLOSED' && styles.activeFilterButton
-                        ]}
-                        onPress={() => handleIssueStateChange('CLOSED')}
-                    >
-                        <Text
-                            style={[
-                                styles.filterButtonText,
-                                issueState === 'CLOSED' && styles.activeFilterText
-                            ]}
-                        >
-                            Closed
-                        </Text>
-                    </TouchableOpacity>
-
-                </View>
-            </View>
-
-            <View style={styles.searchContainer}>
-                <TextInput
-                    style={styles.searchInput}
-                    placeholder='Search issues...'
-                    value={searchText}
-                    onChangeText={setSearchText}
-                />
-
-                {(!!searchText) && (
-                    <TouchableOpacity
-                        style={styles.searchButton}
-                        onPress={handleSearch}
-                    >
-                        <Text style={styles.searchButtonText}>Search</Text>
-                    </TouchableOpacity>
-                )}
-            </View>
+            <SearchBar onSearch={setDebouncedSearchText} debounceTime={1000} />
 
             {(!data?.search?.edges) && loading ? (
                 <ActivityIndicator style={styles.loader} />
@@ -226,32 +159,6 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#cccccc',
     },
-    header: {
-        padding: 14,
-        backgroundColor: '#0D1117',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-    },
-    headerTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: 'white',
-    },
-    searchContainer: {
-        flexDirection: 'row',
-        padding: 12,
-        backgroundColor: 'white',
-    },
-    searchInput: {
-        flex: 1,
-        height: 40,
-        borderWidth: 1,
-        borderColor: '#e1e4e8',
-        borderRadius: 4,
-        paddingHorizontal: 12,
-        backgroundColor: '#fff',
-    },
     searchButton: {
         marginLeft: 8,
         backgroundColor: '#0366d6',
@@ -275,34 +182,6 @@ const styles = StyleSheet.create({
         color: "red",
         textAlign: "center",
         marginTop: 20
-    },
-    filterContainer: {
-        flexDirection: 'row',
-        padding: 12,
-        backgroundColor: 'white',
-        borderBottomWidth: 1,
-        borderBottomColor: '#e1e4e8',
-    },
-    filterButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginRight: 16,
-        paddingVertical: 6,
-        paddingHorizontal: 12,
-        borderRadius: 16,
-    },
-    activeFilterButton: {
-        backgroundColor: '#f1f8ff',
-        borderWidth: 1,
-        borderColor: '#0366d6',
-    },
-    filterButtonText: {
-        fontSize: 14,
-        color: '#586069',
-    },
-    activeFilterText: {
-        color: '#0366d6',
-        fontWeight: 'bold',
     },
     emptyContainer: {
         padding: 24,

@@ -74,3 +74,13 @@ export interface IssueTitleStateProps {
     title: string,
     state: 'OPEN' | 'CLOSED',
 }
+
+export interface HomeHeaderProps {
+    currentState: 'OPEN' | 'CLOSED'
+    onStateChange: (state: 'OPEN' | 'CLOSED') => void
+}
+
+export interface SearchBarProps {
+    onSearch: (text: string) => void
+    debounceTime?: number,
+}
