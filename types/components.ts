@@ -84,3 +84,14 @@ export interface SearchBarProps {
     onSearch: (text: string) => void
     debounceTime?: number,
 }
+
+export interface IssuesListProps {
+    data: Issue[] | undefined,
+    loading: boolean,
+    error: any,
+    refreshing: boolean,
+    onRefresh: () => void,
+    onLoadMore: () => void,
+    onIssuePress: (issue: Issue) => void,
+    isLoadingMore: boolean
+}
