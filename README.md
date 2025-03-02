@@ -23,6 +23,15 @@ For navigation, I implemented Expo Router which provides a file-based routing sy
 ### TypeScript
 The entire project is written in TypeScript, providing type safety and improving development experience through better IDE support and early error detection. This was especially valuable when working with GraphQL's complex response structures.
 
+For future iterations, I plan to enhance type safety by implementing GraphQL introspection to automatically generate TypeScript types from the GitHub GraphQL schema. This approach would:
+
+- Ensure perfect alignment between API types and client-side code
+- Reduce manual type definition maintenance
+- Catch breaking API changes at compile time
+- Improve developer experience with better autocompletion
+
+Tools like GraphQL Code Generator could be integrated to automate this process as part of the build pipeline.
+
 ### Component Architecture
 My main goal was to adopt a component-based architecture with clear separation of concerns:
 - Reusable UI components for common elements
