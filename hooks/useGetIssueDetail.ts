@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { UseGetIssueDetailResult } from '../types/hooks'
 import { useQuery } from '@apollo/client'
 import { IssueDetailResult } from '../types/github'

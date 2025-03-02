@@ -4,7 +4,6 @@ import {
     Text,
     TouchableOpacity,
 } from 'react-native'
-
 import { IssueHeaderProps } from '../types/components'
 
 export default function IssueHeader({
