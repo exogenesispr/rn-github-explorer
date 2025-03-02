@@ -12,3 +12,11 @@ export interface UseSearchIssuesResult {
     totalCount: number,
     hasNextPage: boolean
 }
+
+export interface UseGetIssueDetailResult {
+    issue: Issue | undefined,
+    loading: boolean,
+    error: ApolloError | undefined,
+    refreshing: boolean,
+    handleRefresh: () => void,
+}

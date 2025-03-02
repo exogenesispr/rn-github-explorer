@@ -6,35 +6,25 @@ import {
     RefreshControl,
 } from 'react-native'
 
-import { useQuery } from '@apollo/client'
-
 import ErrorView from '../components/ErrorView'
 import LoadingView from '../components/LoadingView'
 
 import { useLocalSearchParams, useRouter } from 'expo-router'
-import { GET_ISSUE_DETAIL } from '../graphql/queries/getIssueDetail'
-import { IssueDetailResult } from '../types/github'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { useRefresh } from '../hooks/useRefresh'
 import IssueHeader from '../components/IssueHeader'
 import IssueMetadata from '../components/IssueMetadata'
 import CommentList from '../components/CommentList'
 import IssueBody from '../components/IssueBody'
 import LabelsList from '../components/LabelsList'
 import IssueTitleAndState from '../components/IssueTitleState'
+import { useGetIssueDetail } from '../hooks/useGetIssueDetail'
 
 export default function IssueDetailScreen() {
     const params = useLocalSearchParams()
     const router = useRouter()
     const issueNumber = Number(params.id)
-    console.log(params.id)
 
-    const { loading, error, data, refetch } = useQuery<IssueDetailResult>(GET_ISSUE_DETAIL, {
-        variables: { number: issueNumber },
-        skip: !issueNumber
-    })
-
-    const { refreshing, handleRefresh } = useRefresh(refetch)
+    const { issue, loading, error, refreshing, handleRefresh } = useGetIssueDetail(issueNumber)
 
     const handleGoBack = () => {
         router.canGoBack() ? (
@@ -60,8 +50,6 @@ export default function IssueDetailScreen() {
             />
         )
     }
-
-    const issue = data?.repository?.issue
 
     if (!issue) {
         return (

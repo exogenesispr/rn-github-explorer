@@ -2,13 +2,9 @@ import { useState } from 'react'
 import {
     StyleSheet
 } from 'react-native'
-
-import { useQuery } from '@apollo/client'
-import { SEARCH_ISSUES } from '../graphql/queries/searchIssues'
-import { Issue, SearchQueryResult } from '../types/github'
+import { Issue } from '../types/github'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
-import { useRefresh } from '../hooks/useRefresh'
 import HomeHeader from '../components/HomeHeader'
 import SearchBar from '../components/SearchBar'
 import IssuesList from '../components/IssuesList'
