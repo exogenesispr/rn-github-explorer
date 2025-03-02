@@ -12,80 +12,26 @@ import { useRefresh } from '../hooks/useRefresh'
 import HomeHeader from '../components/HomeHeader'
 import SearchBar from '../components/SearchBar'
 import IssuesList from '../components/IssuesList'
+import { useSearchIssues } from '../hooks/useSearchIssues'
 
 export default function IssueListScreen() {
     const router = useRouter()
     const [debouncedSearchText, setDebouncedSearchText] = useState('')
     const [issueState, setIssueState] = useState<'OPEN' | 'CLOSED'>('OPEN')
-    const [isLoadingMore, setIsLoadingMore] = useState(false)
 
-    const buildQueryString = () => {
-        let query = 'repo:facebook/react-native is:issue ';
-
-        query += `is:${issueState.toLowerCase()} `;
-
-        if (debouncedSearchText) {
-            query += `${debouncedSearchText} in:title,body `;
-        }
-
-        return query.trim()
-    }
-
-    const { loading, error, data, refetch, fetchMore } = useQuery<SearchQueryResult>(SEARCH_ISSUES, {
-        variables: {
-            query: buildQueryString(),
-            first: 10,
-            after: null
-        },
-        notifyOnNetworkStatusChange: true,
-    })
-
-    const { refreshing, handleRefresh } = useRefresh(refetch)
-
-    const handleLoadMore = () => {
-        const pageInfo = data?.search?.pageInfo
-
-        if (pageInfo?.hasNextPage && !isLoadingMore) {
-            setIsLoadingMore(true)
-
-            fetchMore({
-                variables: {
-                    after: pageInfo?.endCursor,
-                    query: buildQueryString(),
-                    first: 10,
-                },
-
-                updateQuery: (
-                    prevResult: SearchQueryResult,
-                    options: { fetchMoreResult: SearchQueryResult | undefined }) => {
-                    if (!options.fetchMoreResult)
-                        return prevResult
-
-                    return {
-                        search: {
-                            ...options.fetchMoreResult.search,
-                            edges: [
-                                ...prevResult.search.edges,
-                                ...options.fetchMoreResult.search.edges
-                            ]
-                        }
-                    }
-                }
-            }).finally(() => {
-                setIsLoadingMore(false)
-            })
-        }
-    }
-
-    const handleIssueStateChange = (newState: 'OPEN' | 'CLOSED') => {
-        setIssueState(newState)
-    }
+    const {
+        issues,
+        loading,
+        error,
+        refreshing,
+        isLoadingMore,
+        handleRefresh,
+        handleLoadMore,
+    } = useSearchIssues(debouncedSearchText, issueState)
 
     const handleIssuePress = (issue: Issue) => {
         router.push(`/${issue.number}`)
     }
-
-    const issues = data?.search?.edges?.map((edge) => edge.node) || []
 
     return (
         <SafeAreaView style={styles.container}>
