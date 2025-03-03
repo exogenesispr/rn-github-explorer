@@ -15,7 +15,7 @@ export function useSearchIssues(
     const buildQueryString = () => {
         let query = 'repo:facebook/react-native is:issue '
 
-        query += `is:${issueState.toLowerCase()}`
+        query += `is:${issueState.toLowerCase()} `
 
         if (debouncedSearchText) {
             query += `${debouncedSearchText} in:title,body `
