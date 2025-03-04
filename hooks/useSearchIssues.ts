@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useQuery } from '@apollo/client'
 import { SearchQueryResult } from '../types/github'
 import { SEARCH_ISSUES } from '../graphql/queries/searchIssues'
@@ -12,17 +12,18 @@ export function useSearchIssues(
 ): UseSearchIssuesResult {
     const [isLoadingMore, setIsLoadingMore] = useState(false)
 
-    const buildQueryString = () => {
+
+    const buildQueryString = useCallback(() => {
         let query = 'repo:facebook/react-native is:issue '
 
-        query += `is:${issueState.toLowerCase()}`
+        query += `is:${issueState.toLowerCase()} `
 
         if (debouncedSearchText) {
             query += `${debouncedSearchText} in:title,body `
         }
 
         return query.trim()
-    }
+    }, [debouncedSearchText, issueState])
 
     const { loading, error, data, refetch, fetchMore } = useQuery<SearchQueryResult>(SEARCH_ISSUES, {
         variables: {
@@ -74,9 +75,17 @@ export function useSearchIssues(
         }
     }
 
-    const issues = data?.search?.edges?.map((edge) => edge.node) || []
-    const totalCount = data?.search?.issueCount || 0
-    const hasNextPage = data?.search?.pageInfo?.hasNextPage || false
+    const issues = useMemo(() => {
+        return data?.search?.edges?.map((edge) => edge.node) || []
+    }, [data?.search?.edges])
+
+    const totalCount = useMemo(() => {
+        return data?.search?.issueCount || 0
+    }, [data?.search?.issueCount])
+
+    const hasNextPage = useMemo(() => {
+        return data?.search?.pageInfo?.hasNextPage || false
+    }, [data?.search?.pageInfo?.hasNextPage])
 
     return {
         issues,
