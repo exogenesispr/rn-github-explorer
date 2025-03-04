@@ -28,5 +28,5 @@ jobs:
             - name: Run typescript type checking
               run: npm run typecheck
 
-            - name: build project
-              run: npm run build
+            - name: verify app starts
+              run: npx expo start --no-dev --web
