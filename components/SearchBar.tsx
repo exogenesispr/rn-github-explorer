@@ -9,10 +9,11 @@ import { SearchBarProps } from '../types/components'
 
 
 export default function SearchBar({
+    initialValue = '',
     onSearch,
     debounceTime = 700
 }: SearchBarProps) {
-    const [searchText, setSearchText] = useState('')
+    const [searchText, setSearchText] = useState(initialValue)
 
     useEffect(() => {
         const timer = setTimeout(() => {

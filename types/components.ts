@@ -81,6 +81,7 @@ export interface HomeHeaderProps {
 }
 
 export interface SearchBarProps {
+    initialValue?: string,
     onSearch: (text: string) => void
     debounceTime?: number,
 }

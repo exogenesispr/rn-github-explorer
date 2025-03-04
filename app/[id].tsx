@@ -20,9 +20,9 @@ import IssueTitleAndState from '../components/IssueTitleState'
 import { useGetIssueDetail } from '../hooks/useGetIssueDetail'
 
 export default function IssueDetailScreen() {
-    const params = useLocalSearchParams()
+    const { id } = useLocalSearchParams()
     const router = useRouter()
-    const issueNumber = Number(params.id)
+    const issueNumber = Number(id)
 
     const { issue, loading, error, refreshing, handleRefresh } = useGetIssueDetail(issueNumber)
 
