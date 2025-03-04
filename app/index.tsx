@@ -24,10 +24,12 @@ export default function IssueListScreen() {
     useEffect(() => {
         const timeoutId = setTimeout(() => {
 
-            const newParams: Record<string, string> = {}
+            const newParams: Record<string, (string | undefined)> = {}
 
             if (debouncedSearchText) {
                 newParams.q = debouncedSearchText
+            } else {
+                newParams.q = undefined
             }
 
             newParams.state = issueState
