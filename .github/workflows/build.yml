@@ -1,0 +1,32 @@
+name: Build and Test
+
+on:
+    push:
+        branches: [main]
+    pull_request:
+        branches: [main]
+            
+jobs:
+    build:
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v3
+
+            - name: Setup node.js
+              uses: actions/setup-node@v3
+              with: 
+                node-version: '20'
+
+            - name: install dependencies
+              run: npm ci
+
+            - name: create .env file
+              run: |
+                echo "GITHUB_ACCESS_TOKEN=${{ secrets.GH_ACCESS_TOKEN}}" > .env
+
+            - name: Run typescript type checking
+              run: npm run typecheck
+
+            - name: build project
+              run: npm run build
